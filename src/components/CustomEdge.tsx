@@ -1,6 +1,5 @@
 import { BaseEdge, EdgeProps, getSmoothStepPath, EdgeLabelRenderer, useReactFlow } from '@xyflow/react';
 import { X } from 'lucide-react';
-import { useState } from 'react';
 
 export const CustomEdge = ({
   id,
@@ -12,9 +11,9 @@ export const CustomEdge = ({
   targetPosition,
   style = {},
   markerEnd,
+  selected,
 }: EdgeProps) => {
   const { setEdges } = useReactFlow();
-  const [isHovered, setIsHovered] = useState(false);
 
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
@@ -26,22 +25,13 @@ export const CustomEdge = ({
     borderRadius: 16,
   });
 
-  const onEdgeDelete = () => {
+  const onEdgeDelete = (event: React.MouseEvent) => {
+    event.stopPropagation();
     setEdges((edges) => edges.filter((edge) => edge.id !== id));
   };
 
   return (
     <>
-      {/* Invisible wider path for hover detection */}
-      <path
-        d={edgePath}
-        fill="none"
-        strokeWidth={20}
-        stroke="transparent"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={{ cursor: 'pointer' }}
-      />
       {/* Glow layer */}
       <BaseEdge
         id={`${id}-glow`}
@@ -68,27 +58,19 @@ export const CustomEdge = ({
       <circle r="4" fill="hsl(180 100% 60%)">
         <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} />
       </circle>
-      {/* Delete button */}
+      {/* Delete button - always visible */}
       <EdgeLabelRenderer>
-        <div
+        <button
+          onClick={onEdgeDelete}
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
             pointerEvents: 'all',
           }}
-          className="nodrag nopan"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          className="nodrag nopan w-5 h-5 rounded-full bg-background/80 border border-border text-muted-foreground flex items-center justify-center hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-colors"
         >
-          {isHovered && (
-            <button
-              onClick={onEdgeDelete}
-              className="w-6 h-6 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+          <X className="w-3 h-3" />
+        </button>
       </EdgeLabelRenderer>
     </>
   );
