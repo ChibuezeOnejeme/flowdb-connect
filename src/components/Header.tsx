@@ -1,6 +1,13 @@
 import { Database, GitBranch, Sparkles } from 'lucide-react';
 
-export const Header = () => {
+interface HeaderProps {
+  nodeCount: number;
+  edgeCount: number;
+}
+
+export const Header = ({ nodeCount, edgeCount }: HeaderProps) => {
+  const isConnected = edgeCount >= 1 && nodeCount >= 2;
+  
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-xl flex items-center justify-between px-6">
       <div className="flex items-center gap-3">
@@ -21,14 +28,24 @@ export const Header = () => {
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border">
           <Database className="w-4 h-4 text-node-database" />
-          <span className="text-xs font-mono text-muted-foreground">5 nodes</span>
+          <span className="text-xs font-mono text-muted-foreground">{nodeCount} nodes</span>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
+          isConnected 
+            ? 'bg-emerald-500/10 border border-emerald-500/30' 
+            : 'bg-red-500/10 border border-red-500/30'
+        }`}>
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              isConnected ? 'bg-emerald-400' : 'bg-red-400'
+            }`} />
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${
+              isConnected ? 'bg-emerald-500' : 'bg-red-500'
+            }`} />
           </span>
-          <span className="text-xs font-mono text-emerald-400">All connected</span>
+          <span className={`text-xs font-mono ${isConnected ? 'text-emerald-400' : 'text-red-400'}`}>
+            {isConnected ? 'Connected' : 'Not connected'}
+          </span>
         </div>
       </div>
     </header>
