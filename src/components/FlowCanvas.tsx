@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -93,10 +93,18 @@ const initialEdges: Edge[] = [
   },
 ];
 
-export const FlowCanvas = () => {
+interface FlowCanvasProps {
+  onStatsChange?: (nodeCount: number, edgeCount: number) => void;
+}
+
+export const FlowCanvas = ({ onStatsChange }: FlowCanvasProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(10);
+
+  useEffect(() => {
+    onStatsChange?.(nodes.length, edges.length);
+  }, [nodes.length, edges.length, onStatsChange]);
 
   const onConnect = useCallback(
     (params: Connection) => {
