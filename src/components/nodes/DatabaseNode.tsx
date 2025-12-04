@@ -16,7 +16,7 @@ const iconMap = {
 };
 
 const labelMap = {
-  postgresql: 'PostgreSQL',
+  postgresql: 'Neon Postgres',
   mysql: 'MySQL',
   mongodb: 'MongoDB',
   redis: 'Redis',

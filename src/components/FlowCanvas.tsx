@@ -179,7 +179,7 @@ function getNodeData(type: string, subtype: string) {
   switch (type) {
     case 'database':
       return { 
-        label: subtype === 'postgresql' ? 'PostgreSQL' : 
+        label: subtype === 'postgresql' ? 'Neon Postgres' : 
                subtype === 'mysql' ? 'MySQL' : 
                subtype === 'mongodb' ? 'MongoDB' : 'Redis',
         type: subtype,
