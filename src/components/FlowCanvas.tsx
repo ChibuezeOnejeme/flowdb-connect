@@ -10,12 +10,14 @@ import {
   BackgroundVariant,
   type Node,
   type Edge,
+  type NodeMouseHandler,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { DatabaseNode, AppNode, ApiNode, StorageNode } from './nodes';
 import { CustomEdge } from './CustomEdge';
 import { FlowToolbar } from './FlowToolbar';
+import { NodeDetailsModal } from './NodeDetailsModal';
 import { toast } from 'sonner';
 
 const nodeTypes = {
@@ -101,6 +103,8 @@ export const FlowCanvas = ({ onStatsChange }: FlowCanvasProps) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(10);
+  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     onStatsChange?.(nodes.length, edges.length);
@@ -111,10 +115,24 @@ export const FlowCanvas = ({ onStatsChange }: FlowCanvasProps) => {
       setEdges((eds) =>
         addEdge({ ...params, type: 'custom', animated: true }, eds)
       );
-      toast.success('Connection created');
+      toast.success('Connection established - nodes are now linked');
     },
     [setEdges]
   );
+
+  const onNodeClick: NodeMouseHandler = useCallback((_, node) => {
+    setSelectedNode(node);
+    setModalOpen(true);
+  }, []);
+
+  const handleNodeSave = useCallback((nodeId: string, data: Record<string, unknown>) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId ? { ...node, data: { ...node.data, ...data } } : node
+      )
+    );
+    toast.success('Configuration saved');
+  }, [setNodes]);
 
   const handleAddNode = useCallback(
     (type: string, subtype: string) => {
@@ -149,6 +167,7 @@ export const FlowCanvas = ({ onStatsChange }: FlowCanvasProps) => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         defaultEdgeOptions={{
@@ -171,6 +190,12 @@ export const FlowCanvas = ({ onStatsChange }: FlowCanvasProps) => {
           color="hsl(220 15% 25%)"
         />
       </ReactFlow>
+      <NodeDetailsModal
+        node={selectedNode}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleNodeSave}
+      />
     </div>
   );
 };
