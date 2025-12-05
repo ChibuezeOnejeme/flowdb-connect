@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Controls,
@@ -51,14 +51,14 @@ const getInitialData = () => {
       {
         id: 'database-1',
         type: 'database',
-        position: { x: 100, y: 350 },
+        position: { x: 100, y: 300 },
         data: { label: 'Supabase', supabaseUrl: '', supabaseKey: '' },
       },
       {
         id: 'webapp-1',
         type: 'webapp',
-        position: { x: 500, y: 200 },
-        data: { label: 'Web App', containerUrl: '', dockerImage: '', port: '', connectedEnvs: 0, connectedDbs: 0 },
+        position: { x: 450, y: 200 },
+        data: { label: 'Web App', containerUrl: '', dockerImage: '', port: '' },
       },
     ],
     edges: [],
@@ -71,33 +71,6 @@ export const FlowCanvas = ({ onStatsChange }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialData.edges);
   const [selectedNode, setSelectedNode] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // Calculate connections for each webapp node
-  const nodesWithConnections = useMemo(() => {
-    return nodes.map(node => {
-      if (node.type === 'webapp') {
-        const incomingEdges = edges.filter(e => e.target === node.id);
-        const connectedEnvs = incomingEdges.filter(e => {
-          const sourceNode = nodes.find(n => n.id === e.source);
-          return sourceNode?.type === 'env';
-        }).length;
-        const connectedDbs = incomingEdges.filter(e => {
-          const sourceNode = nodes.find(n => n.id === e.source);
-          return sourceNode?.type === 'database';
-        }).length;
-        
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            connectedEnvs,
-            connectedDbs,
-          }
-        };
-      }
-      return node;
-    });
-  }, [nodes, edges]);
 
   // Save to localStorage whenever nodes or edges change
   useEffect(() => {
@@ -127,12 +100,6 @@ export const FlowCanvas = ({ onStatsChange }) => {
         return;
       }
 
-      // Check if this exact connection already exists
-      const connectionExists = edges.some(
-        e => e.source === params.source && e.target === params.target
-      );
-      if (connectionExists) return;
-
       setEdges((eds) =>
         addEdge(
           {
@@ -144,7 +111,7 @@ export const FlowCanvas = ({ onStatsChange }) => {
         )
       );
     },
-    [nodes, edges, setEdges]
+    [nodes, setEdges]
   );
 
   const onNodeClick = useCallback((event, node) => {
@@ -173,7 +140,7 @@ export const FlowCanvas = ({ onStatsChange }) => {
         data = { label: 'Supabase', supabaseUrl: '', supabaseKey: '' };
         break;
       case 'webapp':
-        data = { label: 'Web App', containerUrl: '', dockerImage: '', port: '', connectedEnvs: 0, connectedDbs: 0 };
+        data = { label: 'Web App', containerUrl: '', dockerImage: '', port: '' };
         break;
       default:
         break;
@@ -191,7 +158,7 @@ export const FlowCanvas = ({ onStatsChange }) => {
   return (
     <div className="w-full h-full relative">
       <ReactFlow
-        nodes={nodesWithConnections}
+        nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
