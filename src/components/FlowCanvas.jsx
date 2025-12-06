@@ -177,6 +177,9 @@ export const FlowCanvas = ({ onStatsChange }) => {
           animated: true,
         }}
         fitView
+        fitViewOptions={{ maxZoom: 1, padding: 0.2 }}
+        minZoom={0.3}
+        maxZoom={2}
         className="bg-background"
       >
         <Controls className="!bg-card/80 !backdrop-blur-sm !border-border !rounded-lg [&>button]:!bg-card [&>button]:!border-border [&>button]:!text-foreground [&>button:hover]:!bg-muted" />
