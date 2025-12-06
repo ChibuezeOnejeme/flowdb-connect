@@ -29,40 +29,46 @@ const edgeTypes = {
 
 const STORAGE_KEY = 'infrastructure-flow-data';
 
+const defaultNodes = [
+  {
+    id: 'env-1',
+    type: 'env',
+    position: { x: 100, y: 100 },
+    data: { label: 'ENV Variables', variables: {} },
+  },
+  {
+    id: 'database-1',
+    type: 'database',
+    position: { x: 100, y: 300 },
+    data: { label: 'Supabase', supabaseUrl: '', supabaseKey: '' },
+  },
+  {
+    id: 'webapp-1',
+    type: 'webapp',
+    position: { x: 450, y: 200 },
+    data: { label: 'Web App', containerUrl: '', dockerImage: '', port: '' },
+  },
+];
+
 const getInitialData = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const { nodes, edges } = JSON.parse(saved);
-      return { nodes, edges };
+      const parsed = JSON.parse(saved);
+      // Validate that we have valid node types
+      const validTypes = ['env', 'database', 'webapp'];
+      const validNodes = parsed.nodes?.filter(n => validTypes.includes(n.type)) || [];
+      
+      if (validNodes.length > 0) {
+        return { nodes: validNodes, edges: parsed.edges || [] };
+      }
     }
   } catch (e) {
     console.error('Failed to load saved data:', e);
+    localStorage.removeItem(STORAGE_KEY);
   }
   
-  return {
-    nodes: [
-      {
-        id: 'env-1',
-        type: 'env',
-        position: { x: 100, y: 100 },
-        data: { label: 'ENV Variables', variables: {} },
-      },
-      {
-        id: 'database-1',
-        type: 'database',
-        position: { x: 100, y: 300 },
-        data: { label: 'Supabase', supabaseUrl: '', supabaseKey: '' },
-      },
-      {
-        id: 'webapp-1',
-        type: 'webapp',
-        position: { x: 450, y: 200 },
-        data: { label: 'Web App', containerUrl: '', dockerImage: '', port: '' },
-      },
-    ],
-    edges: [],
-  };
+  return { nodes: defaultNodes, edges: [] };
 };
 
 export const FlowCanvas = ({ onStatsChange }) => {
