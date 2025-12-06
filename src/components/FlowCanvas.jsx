@@ -162,7 +162,7 @@ export const FlowCanvas = ({ onStatsChange }) => {
   }, [setNodes, setEdges]);
 
   return (
-    <div className="w-full h-full relative">
+    <div style={{ width: '100%', height: '100%' }} className="relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}

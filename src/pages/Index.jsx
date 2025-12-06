@@ -8,9 +8,9 @@ const Index = () => {
   return (
     <div className="h-screen w-screen flex flex-col bg-background overflow-hidden">
       <Header stats={stats} />
-      <main className="flex-1 relative">
+      <div style={{ width: '100%', height: 'calc(100vh - 56px)' }}>
         <FlowCanvas onStatsChange={setStats} />
-      </main>
+      </div>
     </div>
   );
 };
